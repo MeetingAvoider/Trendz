@@ -26,7 +26,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(404).json({
-        success: "Failed",
+        success: false,
         message: "Please enter email and password",
       });
     }
@@ -44,17 +44,26 @@ const login = async (req, res) => {
         message: "wrong email id and password ",
       });
     }
-    console.log(process.env.SECRET_KEYS, process.env.EXPIRES_TIME);
+
     const token = jsonwebtoken.sign(
       { id: userDetails._id, email: email, role: userDetails.role },
       process.env.SECRET_KEYS,
       { expiresIn: process.env.EXPIRES_TIME }
     );
-    res.status(200).json({
+    // res.status(200).json({
+    //   success: true,
+    //   message: "logged in successfully",
+    //   token,
+    //   userDetails,
+    // });
+    res.cookie("token", token, { httpOnly: true, secure: false }).json({
       success: true,
-      message: "logged in successfully",
-      token,
-      userDetails,
+      message: "logged in successfullyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+      user: {
+        email: userDetails.email,
+        role: userDetails.role,
+        id: userDetails._id,
+      },
     });
   } catch (error) {
     return res.status(400).json({
@@ -65,7 +74,32 @@ const login = async (req, res) => {
 };
 
 // Logout
+const logout = (req, res) => {
+  res.clearCookie("token").json({
+    success: true,
+    message: "Logged Out Successfully",
+  });
+};
 
 // Auth middleware
+const authMiddlerWare = async (req, res, next) => {
+  const token = req.cookie.token;
+  if (!token) {
+    res.status(401).json({
+      success: false,
+      message: "Unauthorized users",
+    });
+  }
+  try {
+    const decode = jsonwebtoken.verify(token, process.env.SECRET_KEYS);
+    req.user = decode;
+    next();
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-module.exports = { register, login };
+module.exports = { register, login, logout, authMiddlerWare };
