@@ -18,6 +18,15 @@ function CommonForm({
   buttonText,
   isBtnDisabled,
 }) {
+  console.log(
+    formControls,
+    formData,
+    setFormData,
+    onSubmit,
+    buttonText,
+    isBtnDisabled
+  );
+
   function renderInputsByComponentType(getControlItem) {
     let element = null;
     const value = formData[getControlItem.name] || "";

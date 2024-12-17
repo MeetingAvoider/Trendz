@@ -49,10 +49,11 @@ function Signup() {
   return (
     <div>
       <CommonForm
-        controls={registerFormControls}
+        formControls={registerFormControls}
         formData={formData}
         setFormData={setFormData}
         onSubmit={handleSubmit}
+        buttonText={"Submit"}
       />
       <Link to="/auth/login">Already have an account? Login</Link>
     </div>
